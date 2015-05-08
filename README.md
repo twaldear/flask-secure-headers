@@ -100,5 +100,5 @@ def index():
 @sh.wrapper({'CSP':None,'X-XSS-Protection':None})
 def index():
   ...
-```
 # this route will not include Content-Security-Policy or X-XSS-Protection Headers
+```
