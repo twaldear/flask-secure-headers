@@ -15,7 +15,7 @@ Header | Purpose | Default
 [X-Permitted-Cross-Domain-Policies](https://www.adobe.com/devnet/adobe-media-server/articles/cross-domain-xml-for-streaming.html) | Restrict content loaded by flash | master-only
 [X-Frame-Options](https://tools.ietf.org/html/draft-ietf-websec-x-frame-options-02) | Prevent content from being framed and clickjacked | sameorigin
 [X-XSS-Protection](http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx) | IE 8+ XSS protection header | 1; mode=block
-[X-Content-Type-Options](http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx) | IE MIME-type verification | nosniff
+[X-Content-Type-Options](http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx) | IE 9+ MIME-type verification | nosniff
 [X-Download-Options](http://msdn.microsoft.com/en-us/library/ie/jj542450(v=vs.85).aspx) | IE 10+ Prevent downloads from opening | noopen
 
 
@@ -68,7 +68,7 @@ Notes:
 * Header keys can be written using either '_' or '-', but are case sensitive 
   * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
   * Unacceptable: 'x-xss-protection'
-* 2 headers are shortened
+* 2 headers are abreviated
   * CSP = Content-Security-Policy
   * HSTS = Strict-Transport-Security
 
