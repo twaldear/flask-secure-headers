@@ -64,10 +64,13 @@ sh.rewrite({'CSP':None})
 # there will be no CSP header
 ```
 
-Note:
+Notes:
 * Header keys can be written using either '_' or '-', but are case sensitive 
   * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
   * Unacceptable: 'x-xss-protection'
+* 2 headers are shortened
+  * CSP = Content-Security-Policy
+  * HSTS = Strict-Transport-Security
 
 ### Creating the Wrapper
 Add the @sh.wrapper() decorator after your app.route(...) decorators for each route to create the headers based on the policy you have created using the update/remove methods (or the default policy if those were not used)
