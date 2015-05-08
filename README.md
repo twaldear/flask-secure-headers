@@ -64,8 +64,13 @@ sh.rewrite({'CSP':None})
 # there will be no CSP header
 ```
 
+Note:
+* Header keys can be written using either '_' or '-', but are case sensitive 
+  * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
+  * Unacceptable: 'x-xss-protection'
+
 ### Creating the Wrapper
-Add the @sh.wrapper() decorator your app.route(...) decorator for each route to create the headers based on the policy you have created using the update/remove methods (or the default policy if those were not used)
+Add the @sh.wrapper() decorator after your app.route(...) decorators for each route to create the headers based on the policy you have created using the update/remove methods (or the default policy if those were not used)
 ```python
 @app.route('/')
 @sh.wrapper()
@@ -80,9 +85,16 @@ A couple notes:
 * For CSP policy updates lists will be merged, not overwritten. See comment below for example.
 * The next sh.wrapper() method call will not include these changes
 ```python
+""" add sha1 hash to route """
 @app.route('/')
 @sh.wrapper({'CSP':{'script-src':['sha1-klsdjfkl232']}})
 def index():
   ...
-# the wrapper above will produce "script-src 'self' 'sha1-klsdjfkl232'"
+# the wrapper() call above will produce "script-src 'self' 'sha1-klsdjfkl232'"
+
+""" remove CSP and X-XSS-Protection Headers """
+@app.route('/')
+@sh.wrapper({'CSP':None,'X-XSS-Protection':None})
+def index():
+  ...
 ```
