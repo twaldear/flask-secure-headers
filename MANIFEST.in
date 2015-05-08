@@ -1,0 +1,2 @@
+include README.md
+recursive-include flask_secure_headers *
