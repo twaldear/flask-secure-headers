@@ -1,5 +1,5 @@
 # flask-secure-headers
-Secure Header Wrapper for Flask Applications. This is intended to be a simplified version of the [Twitter SecureHeaders Ruby Gem](https://github.com/twitter/secureheaders) for a Flask Application
+Secure Header Wrapper for Flask Applications. This is intended to be a simplified version of the [Twitter SecureHeaders Ruby Gem](https://github.com/twitter/secureheaders)
 
 ## Installation
 Install the extension with using pip, or easy_install. [Pypi Link](https://pypi.python.org/pypi/flask-csp)
@@ -77,7 +77,8 @@ The wrapper() method can also be passed a dict in the same format as update/remo
 
 A couple notes:
 * Changes here will always update the policy instead of rewrite
-* For CSP policy updates the existing policies will be added on to, not overwritten. See comment below
+* For CSP policy updates lists will be merged, not overwritten. See comment below for example.
+* The next sh.wrapper() method call will not include these changes
 ```python
 @app.route('/')
 @sh.wrapper({'CSP':{'script-src':['sha1-klsdjfkl232']}})
