@@ -101,3 +101,4 @@ def index():
 def index():
   ...
 ```
+# this route will not include Content-Security-Policy or X-XSS-Protection Headers
