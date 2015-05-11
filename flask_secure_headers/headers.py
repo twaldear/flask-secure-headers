@@ -7,7 +7,7 @@ class Simple_Header:
 		for k,input in self.inputs.items():
 			if k in self.valid_opts:
 				for param in self.valid_opts[k]:
-					if param is None:
+					if param is None or input is None:
 						return True
 					elif type(param) is str and '+' in param:
 						if re.search(r'^'+param,str(input)):
@@ -22,9 +22,17 @@ class Simple_Header:
 				raise ValueError("Invalid parameter for '%s'. Params are: %s" % (self.__class__.__name__,', '.join(["'%s'" % p for p in self.valid_opts.keys()]) ))
 	
 	def update_policy(self,defaultHeaders):
-		return self.inputs
+		""" if policy in default but not input still return """
+		if self.inputs is not None:
+			for k,v in defaultHeaders.items():
+				if k not in self.inputs:
+					self.inputs[k] = v
+			return self.inputs
+		else:
+			return self.inputs
 
 	def rewrite_policy(self,defaultHeaders):
+		""" return submitted policy """
 		return self.inputs
 	
 	def create_header(self):
@@ -34,6 +42,7 @@ class Simple_Header:
 			_header_list = []
 			for k,v in self.inputs.items():
 				if v is None:
+					print v
 					return  {self.__class__.__name__.replace('_','-'):None}
 				elif k == 'value':
 					_header_list.insert(0,str(v))
@@ -75,7 +84,7 @@ class X_Permitted_Cross_Domain_Policies(Simple_Header):
 class X_XSS_Protection(Simple_Header):
 	""" X_XSS_Protection """
 	def __init__(self,inputs,overide=None):
-		self.valid_opts = {'value':[0,1],'mode':['block']}
+		self.valid_opts = {'value':[0,1],'mode':['block',False]}
 		self.inputs = inputs
 
 class HSTS(Simple_Header):

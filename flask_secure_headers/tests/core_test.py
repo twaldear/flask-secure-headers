@@ -1,8 +1,8 @@
 import unittest
 import tempfile
 from flask import Flask
-from headers import *
-from core import Secure_Headers
+from flask_secure_headers.headers import *
+from flask_secure_headers.core import Secure_Headers
 
 
 class TestAppUseCase(unittest.TestCase):
@@ -47,7 +47,7 @@ class TestAppUseCase(unittest.TestCase):
 		""" test updating policies from wrapper """
 		self.sh.rewrite({'CSP':{'default-src':['none']}})
 		@self.app.route('/')
-		@self.sh.wrapper({'CSP':{'script-src':['self','code.jquery.com']},'X_Permitted_Cross_Domain_Policies':{'value':'none'},'X-XSS-Protection':{'value':1}})
+		@self.sh.wrapper({'CSP':{'script-src':['self','code.jquery.com']},'X_Permitted_Cross_Domain_Policies':{'value':'none'},'X-XSS-Protection':{'value':1,'mode':False}})
 		def index(): return "hi"
 		with self.app.test_client() as c:
 			result = c.get('/')
@@ -152,7 +152,12 @@ class TestPolicyCreation(unittest.TestCase):
 		""" test valid X_XSS_Protection (with parameter)"""
 		h = X_XSS_Protection({'value':'1','mode':'block'})
 		r = h.create_header()
-		self.assertEquals(r['X-XSS-Protection'],'1; mode=block')		
+		self.assertEquals(r['X-XSS-Protection'],'1; mode=block')
+		""" test valid X_XSS_Protection (with parameter set to false)"""
+		h = X_XSS_Protection({'value':'1','mode':False})
+		r = h.create_header()
+		self.assertEquals(r['X-XSS-Protection'],'1')		
+			
 	def test_X_XSS_Protection_fail(self):
 		""" test invalid input for X_XSS_Protection"""
 		h = X_XSS_Protection({'values':1})
@@ -218,5 +223,4 @@ class TestPolicyCreation(unittest.TestCase):
 			h = CSP({'test-src':['self','code.jquery.com']}).update_policy()
 
 if __name__ == '__main__':
-    unittest.main()
-		
+    unittest.main()		

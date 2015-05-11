@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: flask-secure-headers
+Version: 0.2
+Summary: Secure Header Wrapper for Flask Applications
+Home-page: https://github.com/twaldear/flask-secure-headers
+Author: Tristan Waldear
+Author-email: trwaldear@gmail.com
+License: MIT
+Download-URL: https://github.com/twaldear/flask-secure-headers/tarball/0.1
+Description: 
+        Add security headers to a Flask application. This is intended to be a simplified version of the Twitter SecureHeaders Ruby Gem
+        
+Keywords: flask,security,header
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Framework :: Flask
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
