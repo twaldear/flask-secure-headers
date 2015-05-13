@@ -14,6 +14,8 @@ class Simple_Header:
 							return True
 					elif type(param) is bool and type(input) is bool:
 						return True
+					elif type(param) is list and type(input) is list:
+						return True
 					else:
 						if str(input).lower() == str(param):
 							return True
@@ -42,7 +44,6 @@ class Simple_Header:
 			_header_list = []
 			for k,v in self.inputs.items():
 				if v is None:
-					print v
 					return  {self.__class__.__name__.replace('_','-'):None}
 				elif k == 'value':
 					_header_list.insert(0,str(v))
@@ -93,6 +94,45 @@ class HSTS(Simple_Header):
 		self.valid_opts = {'maxage':['[0-9]+'],'include_subdomains':[True,False],'preload':[True,False]}
 		self.inputs = inputs
 		self.__class__.__name__ = 'Strict-Transport-Security'
+
+class HPKP(Simple_Header):
+	""" HPKP """
+	def __init__(self,inputs,overide=None):
+		self.valid_opts = {'maxage':['[0-9]+'],'include_subdomains':[True,False],'report_uri':['*'],'pins':[[]]}
+		self.inputs = inputs
+		self.__class__.__name__ = 'Public-Key-Pins'
+	
+	def update_policy(self,defaultHeaders):
+		""" rewrite update policy so that additional pins are added and not overwritten """
+		if self.inputs is not None:
+			for k,v in defaultHeaders.items():
+				if k not in self.inputs:
+					self.inputs[k] = v
+				if k == 'pins':
+					self.inputs[k] = self.inputs[k] + defaultHeaders[k]
+			return self.inputs
+		else:
+			return self.inputs
+					
+	def create_header(self):
+		""" rewrite return header dict for HPKP """
+		try:
+			self.check_valid()
+			_header_list = []
+			for k,v in self.inputs.items():
+				if v is None:
+					return  {self.__class__.__name__.replace('_','-'):None}
+				elif k == 'value':
+					_header_list.insert(0,str(v))
+				elif isinstance(v,bool):
+					if v is True: _header_list.append(k)
+				elif type(v) is list:
+					lambda v: len(v)>0, [_header_list.append(''.join(['pin-%s=%s' % (pink,pinv) for pink, pinv in pin.items()])) for pin in v]
+				else:
+					_header_list.append('%s=%s' % (k,str(v)))
+			return {self.__class__.__name__.replace('_','-'):'; '.join(_header_list)}
+		except Exception, e:
+			raise
 
 class CSP:
 	def __init__(self, inputs):

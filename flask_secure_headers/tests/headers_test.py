@@ -133,6 +133,49 @@ class TestPolicyCreation(unittest.TestCase):
 		h = HSTS({'maxage':'23','include_subdomains':'Test'})
 		with self.assertRaises(Exception):
 			r = h.create_header()		
-
+			
+	def test_HPKP_pass(self):
+		""" test valid HPKP """
+		h = HPKP({'maxage':'23','include_subdomains':True,'pins':[{'sha256':'1234'}]})
+		r = h.create_header()
+		self.assertEquals(r['Public-Key-Pins'],'pin-sha256=1234; include_subdomains; maxage=23')
+	def test_HPKP_pass_2_pins(self):
+		""" test valid HPKP """
+		h = HPKP({'maxage':'23','include_subdomains':True,'pins':[{'sha256':'1234'},{'sha256':'abcd'}]})
+		r = h.create_header()
+		self.assertEquals(r['Public-Key-Pins'],'pin-sha256=1234; pin-sha256=abcd; include_subdomains; maxage=23')
+	def test_HPKP_pass_no_pins(self):
+		""" test valid HPKP (with no pins) """
+		h = HPKP({'maxage':'23','include_subdomains':True})
+		r = h.create_header()
+		self.assertEquals(r['Public-Key-Pins'],'include_subdomains; maxage=23')		
+	def test_HPKP_pass_no_include_subdomains(self):
+		""" test valid HPKP (with no pins) """
+		h = HPKP({'maxage':'23','include_subdomains':False})
+		r = h.create_header()
+		self.assertEquals(r['Public-Key-Pins'],'maxage=23')		
+	def test_HPHP_fail_nonList(self):
+		""" test invalid pins argument for HPKP (not passing list for pins argument) """
+		h = HPKP({'pins':'test'})
+		with self.assertRaises(Exception):
+			r = h.create_header()
+	def test_HPKP_fail_input(self):
+		""" test invalid input for HPKP """
+		h = HPKP({'test':'test'})
+		with self.assertRaises(Exception):
+			r = h.create_header()
+	def test_HPKP_fail_parameter(self):
+		""" test non-digit maxage value for HPKP """
+		h = HPKP({'maxage':'test'})
+		with self.assertRaises(Exception):
+			r = h.create_header()
+	def test_HPKP_fail_non_boolean(self):
+		""" test non-boolean include_subdomains value for HSTS """
+		h = HPKP({'maxage':'23','include_subdomains':'Test'})
+		with self.assertRaises(Exception):
+			r = h.create_header()					
+			
+			
+					
 if __name__ == '__main__':
     unittest.main()		

@@ -33,6 +33,12 @@ class Secure_Headers:
 				'include_subdomains':True,
 				'preload':False
 			},
+			'HPKP':{
+				'max_age':5184000,
+				'include_subdomains':True,
+				'report_uri':'/hpkp_report',
+				'pins':[],
+			},
 			'X_Frame_Options':{
 				'value':'sameorigin' 
 			},
@@ -48,7 +54,8 @@ class Secure_Headers:
 			},			
 			'X_Permitted_Cross_Domain_Policies':{
 				'value':'none'
-			},	
+			},
+			
 		}
 
 	def policyChange(self,updateParams,func):
