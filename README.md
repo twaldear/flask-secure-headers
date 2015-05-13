@@ -33,7 +33,7 @@ Each header policy is represented by a dict of paramaters. [View default policie
   * Ex: *{'script-src':['self']}* becomes *"script-src 'self'"*
   * self, none, nonce-* ,sha*, unsafe-inline, etc are automatically encapsulated
 * HPKP pins are represented by a list of dicts under the 'pins' paramter {'pins':[{hashType:hash}]}
-  * Ex: {'pins':[{'sha256':'test123'},{'sha256':'testABCD'}]} becomes 'pin-sha256=test1234; pin-sha256=testABCD'
+  * Ex: {'pins':[{'sha256':'1234'},{'sha256':'ABCD'}]} becomes 'pin-sha256=1234; pin-sha256=ABCD'
 
 ### Configuration
 
