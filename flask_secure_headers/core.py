@@ -58,12 +58,30 @@ class Secure_Headers:
 
 		}
 
-	def _get_headers(self):
+	def _getHeaders(self, updateParams=None):
 		""" create headers list for flask wrapper """
+		if not updateParams:
+			updateParams = {}
+		# parse updates in wrapper call first and add to policy dict
+		policies = self.defaultPolicies
+		if len(updateParams) > 0:
+			for k,v in updateParams.items():
+				k = k.replace('-','_')
+				c = globals()[k](v)
+				try:
+					policies[k] = c.update_policy(self.defaultPolicies[k])
+				except Exception, e:
+					raise
+
 		return [globals()[k](v).create_header()
 				for k,v in policies.items() if v is not None]
 
-	def policyChange(self, updateParams,func):
+	def _setRespHeader(self, resp, headers):
+		for hdr in headers:
+			for k,v in hdr.items():
+				resp.headers[k] = v
+
+	def policyChange(self, updateParams, func):
 		""" update defaultPolicy dict """
 		for k,v in updateParams.items():
 			k = k.replace('-','_')
@@ -81,39 +99,23 @@ class Secure_Headers:
 		""" rewrite existing policy to changes """
 		self.policyChange(rewriteParams,'rewrite_policy')
 
-	def wrapper(self, updateParams={}):
+	def wrapper(self, updateParams=None):
 		""" create wrapper for flask app route """
-
-		""" parse updates in wrapper call first and add to policy dict """
-		policies = self.defaultPolicies
-		if len(updateParams) > 0:
-			for k,v in updateParams.items():
-				k = k.replace('-','_')
-				c = globals()[k](v)
-				try:
-					policies[k] = c.update_policy(self.defaultPolicies[k])
-				except Exception, e:
-					raise
-
 		def decorator(f):
+			_headers = self._getHeaders(updateParams)
 			""" flask decorator to include headers """
 			@wraps(f)
 			def decorated_function(*args, **kwargs):
 				resp = make_response(f(*args, **kwargs))
-				h = resp.headers
-				for header in self._get_headers():
-					for k,v in header.items():
-						h[k] = v
+				self._setRespHeader(resp, _headers)
 				return resp
 			return decorated_function
 		return decorator
 
-	def init_app(self, app):
-		_headers = self._get_headers()
+	def init_app(self, app, updateParams=None):
+		_headers = self._getHeaders(updateParams)
 		def add_sec_hdr(resp):
-			for hdr in _headers:
-				for k,v in hdr.iterms():
-					resp.headers[k] = v
+			self._setRespHeader(resp, _headers)
 			return resp
 		app.after_request(add_sec_hdr)
 
