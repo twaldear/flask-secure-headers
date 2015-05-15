@@ -40,7 +40,7 @@ class Secure_Headers:
 				'pins':[],
 			},
 			'X_Frame_Options':{
-				'value':'sameorigin' 
+				'value':'sameorigin'
 			},
 			'X_XSS_Protection':{
 				'value':1,
@@ -51,14 +51,19 @@ class Secure_Headers:
 			},
 			'X_Download_Options':{
 				'value':'noopen'
-			},			
+			},
 			'X_Permitted_Cross_Domain_Policies':{
 				'value':'none'
 			},
-			
+
 		}
 
-	def policyChange(self,updateParams,func):
+	def _get_headers(self):
+		""" create headers list for flask wrapper """
+		return [globals()[k](v).create_header()
+				for k,v in policies.items() if v is not None]
+
+	def policyChange(self, updateParams,func):
 		""" update defaultPolicy dict """
 		for k,v in updateParams.items():
 			k = k.replace('-','_')
@@ -68,17 +73,17 @@ class Secure_Headers:
 			except Exception, e:
 				raise
 
-	def update(self,updateParams):
+	def update(self, updateParams):
 		""" add changes to existing policy """
 		self.policyChange(updateParams,'update_policy')
 
-	def rewrite(self,rewriteParams):
+	def rewrite(self, rewriteParams):
 		""" rewrite existing policy to changes """
 		self.policyChange(rewriteParams,'rewrite_policy')
 
-	def wrapper(self,updateParams={}):
+	def wrapper(self, updateParams={}):
 		""" create wrapper for flask app route """
-		
+
 		""" parse updates in wrapper call first and add to policy dict """
 		policies = self.defaultPolicies
 		if len(updateParams) > 0:
@@ -89,22 +94,26 @@ class Secure_Headers:
 					policies[k] = c.update_policy(self.defaultPolicies[k])
 				except Exception, e:
 					raise
-		
-		""" create headers list for flask wrapper """
-		_headers = []
-		for k,v in policies.items():
-			if v is not None:
-				_headers.append(globals()[k](v).create_header())
-		
+
 		def decorator(f):
 			""" flask decorator to include headers """
 			@wraps(f)
 			def decorated_function(*args, **kwargs):
 				resp = make_response(f(*args, **kwargs))
 				h = resp.headers
-				for header in _headers:
+				for header in self._get_headers():
 					for k,v in header.items():
 						h[k] = v
 				return resp
 			return decorated_function
 		return decorator
+
+	def init_app(self, app):
+		_headers = self._get_headers()
+		def add_sec_hdr(resp):
+			for hdr in _headers:
+				for k,v in hdr.iterms():
+					resp.headers[k] = v
+			return resp
+		app.after_request(add_sec_hdr)
+
