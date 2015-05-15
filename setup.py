@@ -1,6 +1,5 @@
 from setuptools import setup
 
-import flask_secure_headers
 
 setup(
   name = 'flask-secure-headers',
