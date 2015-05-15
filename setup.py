@@ -7,9 +7,9 @@ setup(
   include_package_data = True,
   version = '0.2',
   description = 'Secure Header Wrapper for Flask Applications',
-  long_description = """
-Add security headers to a Flask application. This is intended to be a simplified version of the Twitter SecureHeaders Ruby Gem
-""",
+  long_description = ('Add security headers to a Flask application. '
+                      'This is intended to be a simplified version of the '
+                      'Twitter SecureHeaders Ruby Gem'),
   license='MIT',
   author = 'Tristan Waldear',
   author_email = 'trwaldear@gmail.com',
