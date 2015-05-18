@@ -45,8 +45,8 @@ class TestAppUseCase(unittest.TestCase):
 		with self.app.test_client() as c:
 			result = c.get('/')
 			self.assertEquals(result.headers.get('X-XSS-Protection'),'1; mode=block')
-			self.assertEquals(result.headers.get('Strict-Transport-Security'),'max_age=31536000; include_subdomains')
-			self.assertEquals(result.headers.get('Public-Key-Pins'),'max_age=5184000; include_subdomains; report_uri=/hpkp_report')			
+			self.assertEquals(result.headers.get('Strict-Transport-Security'),'includeSubdomains; max_age=31536000')
+			self.assertEquals(result.headers.get('Public-Key-Pins'),'includeSubdomains; max_age=5184000; report_uri=/hpkp_report')			
 			self.assertEquals(result.headers.get('X-Content-Type-Options'),'nosniff')
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'none')
 			self.assertEquals(result.headers.get('X-Download-Options'),'noopen')
@@ -69,7 +69,7 @@ class TestAppUseCase(unittest.TestCase):
 			result = c.get('/')
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'all')
 			self.assertEquals(result.headers.get('Content-Security-Policy'),"script-src 'self' code.jquery.com; report-uri /csp_report; default-src 'self'")
-			self.assertEquals(result.headers.get('Public-Key-Pins'),"pin-sha256=test123; pin-sha256=test2256; max_age=5184000; include_subdomains; report_uri=/hpkp_report")
+			self.assertEquals(result.headers.get('Public-Key-Pins'),"pin-sha256=test123; pin-sha256=test2256; includeSubdomains; report_uri=/hpkp_report; max_age=5184000")
 
 	def test_rewrite_function(self):
 		""" test config rewrite function """

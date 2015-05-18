@@ -115,9 +115,9 @@ class TestPolicyCreation(unittest.TestCase):
 		self.assertEquals(r['Strict-Transport-Security'],'maxage=23')		
 	def test_HSTS_pass_second_param(self):
 		""" test valid HSTS (with second parameter)"""
-		h = HSTS({'maxage':23,'include_subdomains':True,'preload':False})
+		h = HSTS({'maxage':23,'includeSubdomains':True,'preload':False})
 		r = h.create_header()
-		self.assertEquals(r['Strict-Transport-Security'],'include_subdomains; maxage=23')		
+		self.assertEquals(r['Strict-Transport-Security'],'includeSubdomains; maxage=23')		
 	def test_HSTS_fail_input(self):
 		""" test invalid input for HSTS """
 		h = HSTS({'values':23})
@@ -129,32 +129,36 @@ class TestPolicyCreation(unittest.TestCase):
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HSTS_fail_non_boolean(self):
-		""" test non-boolean include_subdomains value for HSTS """
-		h = HSTS({'maxage':'23','include_subdomains':'Test'})
+		""" test non-boolean includeSubdomains value for HSTS """
+		h = HSTS({'maxage':'23','includeSubdomains':'Test'})
 		with self.assertRaises(Exception):
 			r = h.create_header()		
 			
 	def test_HPKP_pass(self):
 		""" test valid HPKP """
-		h = HPKP({'maxage':'23','include_subdomains':True,'pins':[{'sha256':'1234'}]})
+		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'}]})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'pin-sha256=1234; include_subdomains; maxage=23')
+		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; pin-sha256=1234; maxage=23')
 	def test_HPKP_pass_2_pins(self):
 		""" test valid HPKP """
-		h = HPKP({'maxage':'23','include_subdomains':True,'pins':[{'sha256':'1234'},{'sha256':'abcd'}]})
+		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'},{'sha256':'abcd'}]})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'pin-sha256=1234; pin-sha256=abcd; include_subdomains; maxage=23')
+		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; pin-sha256=1234; pin-sha256=abcd; maxage=23')
 	def test_HPKP_pass_no_pins(self):
 		""" test valid HPKP (with no pins) """
-		h = HPKP({'maxage':'23','include_subdomains':True})
+		h = HPKP({'maxage':'23','includeSubdomains':True})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'include_subdomains; maxage=23')		
-	def test_HPKP_pass_no_include_subdomains(self):
+		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; maxage=23')		
+	def test_HPKP_pass_no_includeSubdomains(self):
 		""" test valid HPKP (with no pins) """
-		h = HPKP({'maxage':'23','include_subdomains':False})
+		h = HPKP({'maxage':'23','includeSubdomains':False})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'maxage=23')		
-	def test_HPHP_fail_nonList(self):
+	def test_HPKP_pass_report_only(self):
+		""" test valid HPKP for Report-Only header """
+		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'}],'report-only':True})
+		r = h.create_header()		
+		self.assertEquals(r['Public-Key-Pins-Report-Only'],'includeSubdomains; pin-sha256=1234; maxage=23')		
+	def test_HPKP_fail_nonList(self):
 		""" test invalid pins argument for HPKP (not passing list for pins argument) """
 		h = HPKP({'pins':'test'})
 		with self.assertRaises(Exception):
@@ -170,8 +174,8 @@ class TestPolicyCreation(unittest.TestCase):
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HPKP_fail_non_boolean(self):
-		""" test non-boolean include_subdomains value for HSTS """
-		h = HPKP({'maxage':'23','include_subdomains':'Test'})
+		""" test non-boolean includeSubdomains value for HSTS """
+		h = HPKP({'maxage':'23','includeSubdomains':'Test'})
 		with self.assertRaises(Exception):
 			r = h.create_header()					
 			

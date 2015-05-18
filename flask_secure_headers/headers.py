@@ -91,16 +91,20 @@ class X_XSS_Protection(Simple_Header):
 class HSTS(Simple_Header):
 	""" HSTS """
 	def __init__(self,inputs,overide=None):
-		self.valid_opts = {'maxage':['[0-9]+'],'include_subdomains':[True,False],'preload':[True,False]}
+		self.valid_opts = {'maxage':['[0-9]+'],'includeSubdomains':[True,False],'preload':[True,False]}
 		self.inputs = inputs
 		self.__class__.__name__ = 'Strict-Transport-Security'
 
 class HPKP(Simple_Header):
 	""" HPKP """
 	def __init__(self,inputs,overide=None):
-		self.valid_opts = {'maxage':['[0-9]+'],'include_subdomains':[True,False],'report_uri':['*'],'pins':[[]]}
+		self.valid_opts = {'maxage':['[0-9]+'],'includeSubdomains':[True,False],'report_uri':['*'],'pins':[[]]}
 		self.inputs = inputs
 		self.__class__.__name__ = 'Public-Key-Pins'
+		if self.inputs is not None and 'report-only' in self.inputs:
+			if self.inputs['report-only'] is True:
+				self.__class__.__name__ += '-Report-Only'
+			del self.inputs['report-only']
 	
 	def update_policy(self,defaultHeaders):
 		""" rewrite update policy so that additional pins are added and not overwritten """

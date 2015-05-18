@@ -30,12 +30,12 @@ class Secure_Headers:
 			},
 			'HSTS':{
 				'max_age':31536000,
-				'include_subdomains':True,
+				'includeSubdomains':True,
 				'preload':False
 			},
 			'HPKP':{
 				'max_age':5184000,
-				'include_subdomains':True,
+				'includeSubdomains':True,
 				'report_uri':'/hpkp_report',
 				'pins':[],
 			},
@@ -62,7 +62,6 @@ class Secure_Headers:
 		""" create headers list for flask wrapper """
 		if not updateParams:
 			updateParams = {}
-		# parse updates in wrapper call first and add to policy dict
 		policies = self.defaultPolicies
 		if len(updateParams) > 0:
 			for k,v in updateParams.items():
@@ -118,4 +117,3 @@ class Secure_Headers:
 			self._setRespHeader(resp, _headers)
 			return resp
 		app.after_request(add_sec_hdr)
-
