@@ -37,7 +37,7 @@ Each header policy is represented by a dict of paramaters. [View default policie
 
 ### Configuration
 
-#### Import
+##### Import
 To load the headers into your flask app, import the function:
 ```python
 from flask_secure_headers.core import Secure_Headers
@@ -45,7 +45,7 @@ from flask_secure_headers.core import Secure_Headers
 sh = Secure_Headers()
 ```
 
-#### Policy Changes
+##### Policy Changes
 There are two methods to change the default policies that will persist throughout the application: update(), rewrite()
 * Update will add to an existing policy
 * Rewrite will replace a policy
@@ -67,14 +67,14 @@ sh.rewrite({'CSP':{'default-src':['none']}})
 # Content-Security-Policy: default-src 'none'
 ```
 
-#### Policy Removal
+##### Policy Removal
 A policy can also be removed by passing None as the value:
 ```python
 sh.rewrite({'CSP':None})
 # there will be no CSP header
 ```
 
-#### Policy parameter removal
+##### Policy parameter removal
 For non-CSP headers that contain multiple paramaters (HSTS and X-XSS-Protection), any paramter other than the first can be removed by passing a value of False:
 ```python
 sh.update({'X-XSS-Protection':{'value':1,'mode':False}})
@@ -84,14 +84,14 @@ sh.update({'HSTS':{'maxage':1,'include_subdomains':True,'preload':False}})
 # will produce Strict-Transport-Security: maxage=1; include_subdomains
 ```
 
-#### Read Only
+##### Read Only
 The HPKP and CSP Headers can be set to "-Read-Only" by passing "'read-only':True" into the policy dict. Examples:
 ```python
 sh.update({'CSP':{'script-src':['self','code.jquery.com']},'read-only':True}) 
 sh.update({'HPKP':{'pins':[{'sha256':'1234'}]},'read-only':True})
 ```
 
-#### Notes
+##### Notes
 * Header keys can be written using either '_' or '-', but are case sensitive 
   * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
   * Unacceptable: 'x-xss-protection'
@@ -102,7 +102,7 @@ sh.update({'HPKP':{'pins':[{'sha256':'1234'}]},'read-only':True})
 
 ### Creating the Wrapper
 
-#### No Policy Updates
+##### No Policy Updates
 Add the @sh.wrapper() decorator after your app.route(...) decorators for each route to create the headers based on the policy you have created using the update/remove methods (or the default policy if those were not used)
 ```python
 @app.route('/')
@@ -111,7 +111,7 @@ def index():
   ...
 ```
 
-#### With Policy Updates
+##### With Policy Updates
 
 The wrapper() method can also be passed a dict in the same format as update/remove to change policies. These policy changes will only effect that specific route.
 
@@ -141,4 +141,4 @@ def index():
 
 ## Contact
 * Author: [@twaldear](https://github.com/twaldear)
-* Idea: [@gaurabb](https://github.com/gaurabb)
+* Idea/Review: [@gaurabb](https://github.com/gaurabb)
