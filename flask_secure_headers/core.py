@@ -40,7 +40,7 @@ class Secure_Headers:
 				'pins':[],
 			},
 			'X_Frame_Options':{
-				'value':'sameorigin' 
+				'value':'sameorigin'
 			},
 			'X_XSS_Protection':{
 				'value':1,
@@ -51,35 +51,18 @@ class Secure_Headers:
 			},
 			'X_Download_Options':{
 				'value':'noopen'
-			},			
+			},
 			'X_Permitted_Cross_Domain_Policies':{
 				'value':'none'
 			},
-			
+
 		}
 
-	def policyChange(self,updateParams,func):
-		""" update defaultPolicy dict """
-		for k,v in updateParams.items():
-			k = k.replace('-','_')
-			c = globals()[k](v)
-			try:
-				self.defaultPolicies[k] = getattr(c,func)(self.defaultPolicies[k])
-			except Exception, e:
-				raise
-
-	def update(self,updateParams):
-		""" add changes to existing policy """
-		self.policyChange(updateParams,'update_policy')
-
-	def rewrite(self,rewriteParams):
-		""" rewrite existing policy to changes """
-		self.policyChange(rewriteParams,'rewrite_policy')
-
-	def wrapper(self,updateParams={}):
-		""" create wrapper for flask app route """
-		
-		""" parse updates in wrapper call first and add to policy dict """
+	def _getHeaders(self, updateParams=None):
+		""" create headers list for flask wrapper """
+		if not updateParams:
+			updateParams = {}
+		# parse updates in wrapper call first and add to policy dict
 		policies = self.defaultPolicies
 		if len(updateParams) > 0:
 			for k,v in updateParams.items():
@@ -89,22 +72,50 @@ class Secure_Headers:
 					policies[k] = c.update_policy(self.defaultPolicies[k])
 				except Exception, e:
 					raise
-		
-		""" create headers list for flask wrapper """
-		_headers = []
-		for k,v in policies.items():
-			if v is not None:
-				_headers.append(globals()[k](v).create_header())
-		
+
+		return [globals()[k](v).create_header()
+				for k,v in policies.items() if v is not None]
+
+	def _setRespHeader(self, resp, headers):
+		for hdr in headers:
+			for k,v in hdr.items():
+				resp.headers[k] = v
+
+	def policyChange(self, updateParams, func):
+		""" update defaultPolicy dict """
+		for k,v in updateParams.items():
+			k = k.replace('-','_')
+			c = globals()[k](v)
+			try:
+				self.defaultPolicies[k] = getattr(c,func)(self.defaultPolicies[k])
+			except Exception, e:
+				raise
+
+	def update(self, updateParams):
+		""" add changes to existing policy """
+		self.policyChange(updateParams,'update_policy')
+
+	def rewrite(self, rewriteParams):
+		""" rewrite existing policy to changes """
+		self.policyChange(rewriteParams,'rewrite_policy')
+
+	def wrapper(self, updateParams=None):
+		""" create wrapper for flask app route """
 		def decorator(f):
+			_headers = self._getHeaders(updateParams)
 			""" flask decorator to include headers """
 			@wraps(f)
 			def decorated_function(*args, **kwargs):
 				resp = make_response(f(*args, **kwargs))
-				h = resp.headers
-				for header in _headers:
-					for k,v in header.items():
-						h[k] = v
+				self._setRespHeader(resp, _headers)
 				return resp
 			return decorated_function
 		return decorator
+
+	def init_app(self, app, updateParams=None):
+		_headers = self._getHeaders(updateParams)
+		def add_sec_hdr(resp):
+			self._setRespHeader(resp, _headers)
+			return resp
+		app.after_request(add_sec_hdr)
+
