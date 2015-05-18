@@ -11,13 +11,13 @@ $ pip install flask-secure-headers
 Header | Purpose | Default Policy
 --- | --- | ---
 [Content-Security-Policy (CSP)](http://www.w3.org/TR/CSP2/) | Restrict rescources to prevent XSS/other attacks | *default-src 'self'; report-uri /csp_report*
-[Strict-Transport-Security (HSTS)](https://tools.ietf.org/html/rfc6797) | Prevent downgrade attacks (https to http) | *max-age=31536000; include_subdomains*
+[Strict-Transport-Security (HSTS)](https://tools.ietf.org/html/rfc6797) | Prevent downgrade attacks (https to http) | *max-age=31536000; includeSubdomains*
 [X-Permitted-Cross-Domain-Policies](https://www.adobe.com/devnet/adobe-media-server/articles/cross-domain-xml-for-streaming.html) | Restrict content loaded by flash | *master-only*
 [X-Frame-Options](https://tools.ietf.org/html/draft-ietf-websec-x-frame-options-02) | Prevent content from being framed and clickjacked | *sameorigin*
 [X-XSS-Protection](http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx) | IE 8+ XSS protection header | *1; mode=block*
 [X-Content-Type-Options](http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx) | IE 9+ MIME-type verification | *nosniff*
 [X-Download-Options](http://msdn.microsoft.com/en-us/library/ie/jj542450(v=vs.85).aspx) | IE 10+ Prevent downloads from opening | *noopen*
-[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max_age=5184000; include_subdomains; report_uri=/hpkp_report [... no default pins]*
+[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max_age=5184000; includeSubdomains; report_uri=/hpkp_report [... no default pins]*
 
 
 ## Usage
@@ -37,6 +37,7 @@ Each header policy is represented by a dict of paramaters. [View default policie
 
 ### Configuration
 
+#### Import
 To load the headers into your flask app, import the function:
 ```python
 from flask_secure_headers.core import Secure_Headers
@@ -44,6 +45,7 @@ from flask_secure_headers.core import Secure_Headers
 sh = Secure_Headers()
 ```
 
+#### Policy Changes
 There are two methods to change the default policies that will persist throughout the application: update(), rewrite()
 * Update will add to an existing policy
 * Rewrite will replace a policy
@@ -65,12 +67,14 @@ sh.rewrite({'CSP':{'default-src':['none']}})
 # Content-Security-Policy: default-src 'none'
 ```
 
+#### Policy Removal
 A policy can also be removed by passing None as the value:
 ```python
 sh.rewrite({'CSP':None})
 # there will be no CSP header
 ```
 
+#### Policy parameter removal
 For non-CSP headers that contain multiple paramaters (HSTS and X-XSS-Protection), any paramter other than the first can be removed by passing a value of False:
 ```python
 sh.update({'X-XSS-Protection':{'value':1,'mode':False}})
@@ -80,7 +84,14 @@ sh.update({'HSTS':{'maxage':1,'include_subdomains':True,'preload':False}})
 # will produce Strict-Transport-Security: maxage=1; include_subdomains
 ```
 
-Notes:
+#### Read Only
+The HPKP and CSP Headers can be set to "-Read-Only" by passing "'read-only':True" into the policy dict. Examples:
+```python
+sh.update({'CSP':{'script-src':['self','code.jquery.com']},'read-only':True}) 
+sh.update({'HPKP':{'pins':[{'sha256':'1234'}]},'read-only':True})
+```
+
+#### Notes
 * Header keys can be written using either '_' or '-', but are case sensitive 
   * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
   * Unacceptable: 'x-xss-protection'
@@ -90,6 +101,8 @@ Notes:
   * HPKP = Public-Key-Pins
 
 ### Creating the Wrapper
+
+#### No Policy Updates
 Add the @sh.wrapper() decorator after your app.route(...) decorators for each route to create the headers based on the policy you have created using the update/remove methods (or the default policy if those were not used)
 ```python
 @app.route('/')
@@ -97,6 +110,8 @@ Add the @sh.wrapper() decorator after your app.route(...) decorators for each ro
 def index():
   ...
 ```
+
+#### With Policy Updates
 
 The wrapper() method can also be passed a dict in the same format as update/remove to change policies. These policy changes will only effect that specific route.
 
@@ -123,3 +138,7 @@ def index():
   ...
 # this route will not include Content-Security-Policy or X-XSS-Protection Headers
 ```
+
+## Contact
+* Author: [@twaldear](https://github.com/twaldear)
+* Idea: [@gaurabb](https://github.com/gaurabb)
