@@ -154,6 +154,11 @@ class TestPolicyCreation(unittest.TestCase):
 		h = HPKP({'max-age':'23','includeSubDomains':False})
 		r = h.create_header()
 		self.assertEquals(r['Public-Key-Pins'],'max-age=23')
+	def test_HPKP_pass_report_only(self):
+		""" test valid HPKP for Report-Only header """
+		h = HPKP({'max-age':'23','includeSubDomains':True,'pins':[{'sha256':'1234'}],'report-only':True})
+		r = h.create_header()		
+		self.assertEquals(r['Public-Key-Pins-Report-Only'],'includeSubDomains; pin-sha256=1234; max-age=23')	
 	def test_HPHP_fail_nonList(self):
 		""" test invalid pins argument for HPKP (not passing list for pins argument) """
 		h = HPKP({'pins':'test'})
