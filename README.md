@@ -11,7 +11,7 @@ $ pip install flask-secure-headers
 Header | Purpose | Default Policy
 --- | --- | ---
 [Content-Security-Policy (CSP)](http://www.w3.org/TR/CSP2/) | Restrict rescources to prevent XSS/other attacks | *default-src 'self'; report-uri /csp_report*
-[Strict-Transport-Security (HSTS)](https://tools.ietf.org/html/rfc6797) | Prevent downgrade attacks (https to http) | *max-age=31536000; includeSubdomains*
+[Strict-Transport-Security (HSTS)](https://tools.ietf.org/html/rfc6797) | Prevent downgrade attacks (https to http) | *max-age=31536000; includeSubDomains*
 [X-Permitted-Cross-Domain-Policies](https://www.adobe.com/devnet/adobe-media-server/articles/cross-domain-xml-for-streaming.html) | Restrict content loaded by flash | *master-only*
 [X-Frame-Options](https://tools.ietf.org/html/draft-ietf-websec-x-frame-options-02) | Prevent content from being framed and clickjacked | *sameorigin*
 [X-XSS-Protection](http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx) | IE 8+ XSS protection header | *1; mode=block*
