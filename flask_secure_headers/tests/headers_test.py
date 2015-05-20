@@ -17,8 +17,8 @@ class TestPolicyCreation(unittest.TestCase):
 			r = h.create_header()
 		h = X_Frame_Options({'value':'fail'})
 		with self.assertRaises(Exception):
-			r = h.create_header()		
-	
+			r = h.create_header()
+
 	def test_X_Content_Type_Options_pass(self):
 		""" test valid X_Content_Type_Options"""
 		h = X_Content_Type_Options({'value':'nosniff'})
@@ -29,12 +29,12 @@ class TestPolicyCreation(unittest.TestCase):
 		h = X_Content_Type_Options({'values':'nosniff'})
 		with self.assertRaises(Exception):
 			r = h.create_header()
-	def test_X_Content_Type_Options_fail_parameter(self):	
+	def test_X_Content_Type_Options_fail_parameter(self):
 		""" test invalid parameter for X_Content_Type_Options"""
 		h = X_Content_Type_Options({'value':'fail'})
 		with self.assertRaises(Exception):
-			r = h.create_header()	
-	
+			r = h.create_header()
+
 	def test_X_Download_Options_pass(self):
 		""" test valid X_Download_Options"""
 		h = X_Download_Options({'value':'noopen'})
@@ -49,7 +49,7 @@ class TestPolicyCreation(unittest.TestCase):
 		""" test invalid parameter for X_Download_Options"""
 		h = X_Download_Options({'value':'fail'})
 		with self.assertRaises(Exception):
-			r = h.create_header()	
+			r = h.create_header()
 
 	def test_X_Permitted_Cross_Domain_Policies_pass(self):
 		""" test valid X_Permitted_Cross_Domain_Policies"""
@@ -65,8 +65,8 @@ class TestPolicyCreation(unittest.TestCase):
 		""" test invalid parameter for X_Permitted_Cross_Domain_Policies"""
 		h = X_Permitted_Cross_Domain_Policies({'value':'fail'})
 		with self.assertRaises(Exception):
-			r = h.create_header()	
-					
+			r = h.create_header()
+
 	def test_X_XSS_Protection_pass_int(self):
 		""" test valid X_XSS_Protection (int)"""
 		h = X_XSS_Protection({'value':1})
@@ -76,7 +76,7 @@ class TestPolicyCreation(unittest.TestCase):
 		""" test valid X_XSS_Protection (str)"""
 		h = X_XSS_Protection({'value':'1'})
 		r = h.create_header()
-		self.assertEquals(r['X-XSS-Protection'],'1')		
+		self.assertEquals(r['X-XSS-Protection'],'1')
 	def test_X_XSS_Protection_pass_second_param(self):
 		""" test valid X_XSS_Protection (with second parameter)"""
 		h = X_XSS_Protection({'value':'1','mode':'block'})
@@ -86,7 +86,7 @@ class TestPolicyCreation(unittest.TestCase):
 		""" test valid X_XSS_Protection (with second parameter set to false)"""
 		h = X_XSS_Protection({'value':'1','mode':False})
 		r = h.create_header()
-		self.assertEquals(r['X-XSS-Protection'],'1')		
+		self.assertEquals(r['X-XSS-Protection'],'1')
 	def test_X_XSS_Protection_fail_input(self):
 		""" test invalid input for X_XSS_Protection"""
 		h = X_XSS_Protection({'values':1})
@@ -105,60 +105,56 @@ class TestPolicyCreation(unittest.TestCase):
 
 	def test_HSTS_pass_int(self):
 		""" test valid HSTS (int)"""
-		h = HSTS({'maxage':23})
+		h = HSTS({'max-age':23})
 		r = h.create_header()
-		self.assertEquals(r['Strict-Transport-Security'],'maxage=23')
+		self.assertEquals(r['Strict-Transport-Security'],'max-age=23')
 	def test_HSTS_pass_str(self):
 		""" test valid HSTS (str)"""
-		h = HSTS({'maxage':'23'})
+		h = HSTS({'max-age':'23'})
 		r = h.create_header()
-		self.assertEquals(r['Strict-Transport-Security'],'maxage=23')		
+		self.assertEquals(r['Strict-Transport-Security'],'max-age=23')
 	def test_HSTS_pass_second_param(self):
 		""" test valid HSTS (with second parameter)"""
-		h = HSTS({'maxage':23,'includeSubdomains':True,'preload':False})
+		h = HSTS({'max-age':23,'includeSubDomains':True,'preload':False})
 		r = h.create_header()
-		self.assertEquals(r['Strict-Transport-Security'],'includeSubdomains; maxage=23')		
+		self.assertEquals(r['Strict-Transport-Security'],'includeSubDomains; max-age=23')
 	def test_HSTS_fail_input(self):
 		""" test invalid input for HSTS """
 		h = HSTS({'values':23})
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HSTS_fail_input_non_digit(self):
-		""" test non-digit maxage value for HSTS """
-		h = HSTS({'maxage':'fail'})
+		""" test non-digit max-age value for HSTS """
+		h = HSTS({'max-age':'fail'})
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HSTS_fail_non_boolean(self):
-		""" test non-boolean includeSubdomains value for HSTS """
-		h = HSTS({'maxage':'23','includeSubdomains':'Test'})
+		""" test non-boolean includeSubDomains value for HSTS """
+		h = HSTS({'max-age':'23','includeSubDomains':'Test'})
 		with self.assertRaises(Exception):
-			r = h.create_header()		
-			
+			r = h.create_header()
+
 	def test_HPKP_pass(self):
 		""" test valid HPKP """
-		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'}]})
+		h = HPKP({'max-age':'23','includeSubDomains':True,'pins':[{'sha256':'1234'}]})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; pin-sha256=1234; maxage=23')
+		self.assertEquals(r['Public-Key-Pins'],'includeSubDomains; pin-sha256=1234; max-age=23')
 	def test_HPKP_pass_2_pins(self):
 		""" test valid HPKP """
-		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'},{'sha256':'abcd'}]})
+		h = HPKP({'max-age':'23','includeSubDomains':True,'pins':[{'sha256':'1234'},{'sha256':'abcd'}]})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; pin-sha256=1234; pin-sha256=abcd; maxage=23')
+		self.assertEquals(r['Public-Key-Pins'],'includeSubDomains; pin-sha256=1234; pin-sha256=abcd; max-age=23')
 	def test_HPKP_pass_no_pins(self):
 		""" test valid HPKP (with no pins) """
-		h = HPKP({'maxage':'23','includeSubdomains':True})
+		h = HPKP({'max-age':'23','includeSubDomains':True})
 		r = h.create_header()
-		self.assertEquals(r['Public-Key-Pins'],'includeSubdomains; maxage=23')		
-	def test_HPKP_pass_no_includeSubdomains(self):
+		self.assertEquals(r['Public-Key-Pins'],'includeSubDomains; max-age=23')
+	def test_HPKP_pass_no_include_subdomains(self):
 		""" test valid HPKP (with no pins) """
-		h = HPKP({'maxage':'23','includeSubdomains':False})
+		h = HPKP({'max-age':'23','includeSubDomains':False})
 		r = h.create_header()
-	def test_HPKP_pass_report_only(self):
-		""" test valid HPKP for Report-Only header """
-		h = HPKP({'maxage':'23','includeSubdomains':True,'pins':[{'sha256':'1234'}],'report-only':True})
-		r = h.create_header()		
-		self.assertEquals(r['Public-Key-Pins-Report-Only'],'includeSubdomains; pin-sha256=1234; maxage=23')		
-	def test_HPKP_fail_nonList(self):
+		self.assertEquals(r['Public-Key-Pins'],'max-age=23')
+	def test_HPHP_fail_nonList(self):
 		""" test invalid pins argument for HPKP (not passing list for pins argument) """
 		h = HPKP({'pins':'test'})
 		with self.assertRaises(Exception):
@@ -169,17 +165,17 @@ class TestPolicyCreation(unittest.TestCase):
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HPKP_fail_parameter(self):
-		""" test non-digit maxage value for HPKP """
-		h = HPKP({'maxage':'test'})
+		""" test non-digit max-age value for HPKP """
+		h = HPKP({'max-age':'test'})
 		with self.assertRaises(Exception):
 			r = h.create_header()
 	def test_HPKP_fail_non_boolean(self):
-		""" test non-boolean includeSubdomains value for HSTS """
-		h = HPKP({'maxage':'23','includeSubdomains':'Test'})
+		""" test non-boolean include_subdomains value for HSTS """
+		h = HPKP({'max-age':'23','includeSubDomains':'Test'})
 		with self.assertRaises(Exception):
-			r = h.create_header()					
-			
-			
-					
+			r = h.create_header()
+
+
+
 if __name__ == '__main__':
-    unittest.main()		
+    unittest.main()

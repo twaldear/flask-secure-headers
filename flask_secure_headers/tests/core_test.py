@@ -23,8 +23,8 @@ class TestCSPHeaderCreation(unittest.TestCase):
 		self.assertEquals(h['Content-Security-Policy'],"default-src 'none'")
 		""" test CSP -report-only header creation """
 		h = CSP({'default-src':['none'],'report-only':True}).create_header()
-		self.assertEquals(h['Content-Security-Policy-Report-Only'],"default-src 'none'")		
-	
+		self.assertEquals(h['Content-Security-Policy-Report-Only'],"default-src 'none'")
+
 	def test_CSP_fail(self):
 		""" test invalid paramter for CSP update """
 		with self.assertRaises(Exception):
@@ -32,11 +32,11 @@ class TestCSPHeaderCreation(unittest.TestCase):
 
 class TestAppUseCase(unittest.TestCase):
 	""" test header creation in flask app """
-	
+
 	def setUp(self):
 		self.app = Flask(__name__)
 		self.sh = Secure_Headers()
-	
+
 	def test_defaults(self):
 		""" test header wrapper with default headers """
 		@self.app.route('/')
@@ -45,14 +45,14 @@ class TestAppUseCase(unittest.TestCase):
 		with self.app.test_client() as c:
 			result = c.get('/')
 			self.assertEquals(result.headers.get('X-XSS-Protection'),'1; mode=block')
-			self.assertEquals(result.headers.get('Strict-Transport-Security'),'includeSubdomains; max_age=31536000')
-			self.assertEquals(result.headers.get('Public-Key-Pins'),'includeSubdomains; max_age=5184000; report_uri=/hpkp_report')			
+			self.assertEquals(result.headers.get('Strict-Transport-Security'),'includeSubDomains; max-age=31536000')
+			self.assertEquals(result.headers.get('Public-Key-Pins'),'includeSubDomains; report-uri=/hpkp_report; max-age=5184000')
 			self.assertEquals(result.headers.get('X-Content-Type-Options'),'nosniff')
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'none')
 			self.assertEquals(result.headers.get('X-Download-Options'),'noopen')
-			self.assertEquals(result.headers.get('X-Frame-Options'),'sameorigin')			
+			self.assertEquals(result.headers.get('X-Frame-Options'),'sameorigin')
 			self.assertEquals(result.headers.get('Content-Security-Policy'),"report-uri /csp_report; default-src 'self'")
-	
+
 	def test_update_function(self):
 		""" test config update function """
 		self.sh.update(
@@ -69,7 +69,7 @@ class TestAppUseCase(unittest.TestCase):
 			result = c.get('/')
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'all')
 			self.assertEquals(result.headers.get('Content-Security-Policy'),"script-src 'self' code.jquery.com; report-uri /csp_report; default-src 'self'")
-			self.assertEquals(result.headers.get('Public-Key-Pins'),"pin-sha256=test123; pin-sha256=test2256; includeSubdomains; report_uri=/hpkp_report; max_age=5184000")
+			self.assertEquals(result.headers.get('Public-Key-Pins'),"pin-sha256=test123; pin-sha256=test2256; includeSubDomains; report-uri=/hpkp_report; max-age=5184000")
 
 	def test_rewrite_function(self):
 		""" test config rewrite function """
@@ -86,7 +86,7 @@ class TestAppUseCase(unittest.TestCase):
 			result = c.get('/')
 			self.assertEquals(result.headers.get('Content-Security-Policy'),"default-src 'none'")
 			self.assertEquals(result.headers.get('Public-Key-Pins'),"pin-sha256=test123")
-	
+
 	def test_wrapper_update_function(self):
 		""" test updating policies from wrapper """
 		self.sh.rewrite(
@@ -117,11 +117,11 @@ class TestAppUseCase(unittest.TestCase):
 		with self.app.test_client() as c:
 			result = c.get('/test')
 			self.assertEquals(result.headers.get('Content-Security-Policy'),"script-src 'self' code.jquery.com 'nonce-1234'; default-src 'none'")
-	
+
 	def test_passing_none_value_rewrite(self):
 		""" test removing header from update/rewrite """
 		self.sh.rewrite({'CSP':None,'X_XSS_Protection':None})
-		@self.app.route('/')	
+		@self.app.route('/')
 		@self.sh.wrapper()
 		def index(): return "hi"
 		with self.app.test_client() as c:
@@ -129,17 +129,17 @@ class TestAppUseCase(unittest.TestCase):
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'none')
 			self.assertEquals(result.headers.get('CSP'),None)
 			self.assertEquals(result.headers.get('X-XSS-Protection'),None)
-	
+
 	def test_passing_none_value_wrapper(self):
 		""" test removing policy from wrapper """
-		@self.app.route('/')	
+		@self.app.route('/')
 		@self.sh.wrapper({'CSP':None,'X-XSS-Protection':None})
 		def index(): return "hi"
 		with self.app.test_client() as c:
 			result = c.get('/')
 			self.assertEquals(result.headers.get('X-Permitted-Cross-Domain-Policies'),'none')
-			self.assertEquals(result.headers.get('CSP'),None)	
+			self.assertEquals(result.headers.get('CSP'),None)
 			self.assertEquals(result.headers.get('X-XSS-Protection'),None)
 
 if __name__ == '__main__':
-    unittest.main()		
+    unittest.main()
