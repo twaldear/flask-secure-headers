@@ -22,7 +22,7 @@ class Simple_Header:
 				raise ValueError("Invalid input for '%s' parameter. Options are: %s" % (k,' '.join(["'%s'," % str(o) for o in self.valid_opts[k]]) ))
 			else:
 				raise ValueError("Invalid parameter for '%s'. Params are: %s" % (self.__class__.__name__,', '.join(["'%s'" % p for p in self.valid_opts.keys()]) ))
-	
+
 	def update_policy(self,defaultHeaders):
 		""" if policy in default but not input still return """
 		if self.inputs is not None:
@@ -36,7 +36,7 @@ class Simple_Header:
 	def rewrite_policy(self,defaultHeaders):
 		""" return submitted policy """
 		return self.inputs
-	
+
 	def create_header(self):
 		""" return header dict """
 		try:
@@ -68,7 +68,7 @@ class X_Content_Type_Options(Simple_Header):
 	def __init__(self,inputs,overide=None):
 		self.valid_opts = {'value':['nosniff']}
 		self.inputs = inputs
-		
+
 
 class X_Download_Options(Simple_Header):
 	""" X_Download_Options """
@@ -91,21 +91,20 @@ class X_XSS_Protection(Simple_Header):
 class HSTS(Simple_Header):
 	""" HSTS """
 	def __init__(self,inputs,overide=None):
-		self.valid_opts = {'maxage':['[0-9]+'],'includeSubdomains':[True,False],'preload':[True,False]}
+		self.valid_opts = {'max-age':['[0-9]+'],'includeSubDomains':[True,False],'preload':[True,False]}
 		self.inputs = inputs
 		self.__class__.__name__ = 'Strict-Transport-Security'
 
 class HPKP(Simple_Header):
 	""" HPKP """
 	def __init__(self,inputs,overide=None):
-		self.valid_opts = {'maxage':['[0-9]+'],'includeSubdomains':[True,False],'report_uri':['*'],'pins':[[]]}
+		self.valid_opts = {'max-age':['[0-9]+'],'includeSubDomains':[True,False],'report-uri':['*'],'pins':[[]]}
 		self.inputs = inputs
 		self.__class__.__name__ = 'Public-Key-Pins'
 		if self.inputs is not None and 'report-only' in self.inputs:
 			if self.inputs['report-only'] is True:
 				self.__class__.__name__ += '-Report-Only'
 			del self.inputs['report-only']
-	
 	def update_policy(self,defaultHeaders):
 		""" rewrite update policy so that additional pins are added and not overwritten """
 		if self.inputs is not None:
@@ -117,7 +116,7 @@ class HPKP(Simple_Header):
 			return self.inputs
 		else:
 			return self.inputs
-					
+
 	def create_header(self):
 		""" rewrite return header dict for HPKP """
 		try:
@@ -146,13 +145,13 @@ class CSP:
 			if self.inputs['report-only'] is True:
 				self.header += '-Report-Only'
 			del self.inputs['report-only']
-	
+
 	def check_valid(self,cspDefaultHeaders):
 		if self.inputs is not None:
 			for p,l in self.inputs.items():
-				if p not in cspDefaultHeaders.keys() and p is not 'rewrite':		
+				if p not in cspDefaultHeaders.keys() and p is not 'rewrite':
 					raise ValueError("Invalid parameter '%s'. Params are: %s" % (p,', '.join(["'%s'" % p for p in cspDefaultHeaders.keys()]) ))
-	
+
 	def update_policy(self,cspDefaultHeaders):
 		""" add items to existing csp policies """
 		try:
@@ -165,12 +164,12 @@ class CSP:
 				return self.inputs
 		except Exception, e:
 			raise
-				
+
 	def rewrite_policy(self,cspDefaultHeaders):
 		""" fresh csp policy """
 		try:
-			self.check_valid(cspDefaultHeaders)		
-			if self.inputs is not None:	
+			self.check_valid(cspDefaultHeaders)
+			if self.inputs is not None:
 				for p,l in cspDefaultHeaders.items():
 					if p in self.inputs:
 						cspDefaultHeaders[p] = self.inputs[p]
@@ -182,11 +181,11 @@ class CSP:
 		except Exception, e:
 			raise
 
-	def create_header(self):		
-		""" return CSP header dict """		
+	def create_header(self):
+		""" return CSP header dict """
 		encapsulate =  re.compile("|".join(['^self','^none','^unsafe-inline','^unsafe-eval','^sha[\d]+-[\w=-]+','^nonce-[\w=-]+']))
 		csp = {}
 		for p,array in self.inputs.items():
 			csp[p] = ' '.join(["'%s'" % l if encapsulate.match(l) else l for l in array])
-			
+
 		return {self.header:'; '.join(['%s %s' % (k, v) for k, v in csp.items() if v != ''])}

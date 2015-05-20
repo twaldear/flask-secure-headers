@@ -5,7 +5,7 @@ setup(
   name = 'flask-secure-headers',
   packages = ['flask_secure_headers'],
   include_package_data = True,
-  version = '0.4',
+  version = '0.5',
   description = 'Secure Header Wrapper for Flask Applications',
   long_description = ('Add security headers to a Flask application. '
                       'This is intended to be a simplified version of the '

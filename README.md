@@ -17,7 +17,7 @@ Header | Purpose | Default Policy
 [X-XSS-Protection](http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx) | IE 8+ XSS protection header | *1; mode=block*
 [X-Content-Type-Options](http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx) | IE 9+ MIME-type verification | *nosniff*
 [X-Download-Options](http://msdn.microsoft.com/en-us/library/ie/jj542450(v=vs.85).aspx) | IE 10+ Prevent downloads from opening | *noopen*
-[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max_age=5184000; includeSubdomains; report_uri=/hpkp_report [... no default pins]*
+[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max_age=5184000; include_subdomains; report-uri=/hpkp_report [... no default pins]*
 
 
 ## Usage
@@ -28,8 +28,8 @@ Each header policy is represented by a dict of paramaters. [View default policie
 * Policies with just a string value are represented as {'value':parameter}
   * Ex: *{'value':'noopen'}* becomes *'noopen'*
 * Policies with additional string values are represented as {value:Bool}
-  * Ex: *{'maxage':1,'include_subdomains':True,'preload':False}* becomes *'maxage=1 include_subdomains'*
-* CSP is represented as a list inside the dict {cspPolicy:[param,param]}. 
+  * Ex: *{'max-age':1,'includeSubDomains':True,'preload':False}* becomes *'max-age=1 includeSubDomains'*
+* CSP is represented as a list inside the dict {cspPolicy:[param,param]}.
   * Ex: *{'script-src':['self']}* becomes *"script-src 'self'"*
   * self, none, nonce-* ,sha*, unsafe-inline, etc are automatically encapsulated
 * HPKP pins are represented by a list of dicts under the 'pins' paramter {'pins':[{hashType:hash}]}
@@ -53,14 +53,14 @@ There are two methods to change the default policies that will persist throughou
 To update/rewrite, pass a dict in of the desired values into the desired method:
 ```python
 """ update """
-sh.update({'CSP':{'script-src':['self','code.jquery.com']}}) 
+sh.update({'CSP':{'script-src':['self','code.jquery.com']}})
 # Content-Security-Policy: script-src 'self' code.jquery.com; report-uri /csp_report; default-src 'self
 sh.update(
  {'X_Permitted_Cross_Domain_Policies':{'value':'all'}},
  {'HPKP':{'pins':[{'sha256':'1234'}]}}
 )
 # X-Permitted-Cross-Domain-Policies: all
-# Public-Key-Pins: max_age=5184000; include_subdomains; report_uri=/hpkp_report; pin-sha256=1234
+# Public-Key-Pins: max-age=5184000; includeSubDomains; report-uri=/hpkp_report; pin-sha256=1234
 
 """ rewrite """
 sh.rewrite({'CSP':{'default-src':['none']}})
@@ -80,19 +80,19 @@ For non-CSP headers that contain multiple paramaters (HSTS and X-XSS-Protection)
 sh.update({'X-XSS-Protection':{'value':1,'mode':False}})
 # will produce X-XSS-Protection: 1
 
-sh.update({'HSTS':{'maxage':1,'include_subdomains':True,'preload':False}})
-# will produce Strict-Transport-Security: maxage=1; include_subdomains
+sh.update({'HSTS':{'max-age':1,'includeSubDomains':True,'preload':False}})
+# will produce Strict-Transport-Security: max-age=1; includeSubDomains
 ```
 
 ##### Read Only
 The HPKP and CSP Headers can be set to "-Read-Only" by passing "'read-only':True" into the policy dict. Examples:
 ```python
-sh.update({'CSP':{'script-src':['self','code.jquery.com']},'read-only':True}) 
+sh.update({'CSP':{'script-src':['self','code.jquery.com']},'read-only':True})
 sh.update({'HPKP':{'pins':[{'sha256':'1234'}]},'read-only':True})
 ```
 
 ##### Notes
-* Header keys can be written using either '_' or '-', but are case sensitive 
+* Header keys can be written using either '_' or '-', but are case sensitive
   * Acceptable: 'X-XSS-Protection','X_XSS_Protection'
   * Unacceptable: 'x-xss-protection'
 * 3 headers are abreviated

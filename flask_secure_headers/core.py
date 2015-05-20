@@ -29,14 +29,14 @@ class Secure_Headers:
 				'report-uri':['/csp_report'],
 			},
 			'HSTS':{
-				'max_age':31536000,
-				'includeSubdomains':True,
+				'max-age':31536000,
+				'includeSubDomains':True,
 				'preload':False
 			},
 			'HPKP':{
-				'max_age':5184000,
-				'includeSubdomains':True,
-				'report_uri':'/hpkp_report',
+				'max-age':5184000,
+				'includeSubDomains':True,
+				'report-uri':'/hpkp_report',
 				'pins':[],
 			},
 			'X_Frame_Options':{
