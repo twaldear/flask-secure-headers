@@ -17,7 +17,7 @@ Header | Purpose | Default Policy
 [X-XSS-Protection](http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx) | IE 8+ XSS protection header | *1; mode=block*
 [X-Content-Type-Options](http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx) | IE 9+ MIME-type verification | *nosniff*
 [X-Download-Options](http://msdn.microsoft.com/en-us/library/ie/jj542450(v=vs.85).aspx) | IE 10+ Prevent downloads from opening | *noopen*
-[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max_age=5184000; include_subdomains; report-uri=/hpkp_report [... no default pins]*
+[Public-Key-Pins (HPKP)]() | Associate host with expected CA or public key | *max-age=5184000; includeSubDomains; report-uri=/hpkp_report [... no default pins]*
 
 
 ## Usage
