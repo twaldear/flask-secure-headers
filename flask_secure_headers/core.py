@@ -1,7 +1,5 @@
 from flask import make_response
 from functools import wraps
-import os
-import json
 from headers import *
 
 class Secure_Headers:
