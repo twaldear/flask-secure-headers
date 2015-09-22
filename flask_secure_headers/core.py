@@ -105,6 +105,7 @@ class Secure_Headers:
 			def decorated_function(*args, **kwargs):
 				resp = make_response(f(*args, **kwargs))
 				self._setRespHeader(resp, _headers)
+				resp.has_secure_headers = True
 				return resp
 			return decorated_function
 		return decorator
@@ -112,6 +113,7 @@ class Secure_Headers:
 	def init_app(self, app, updateParams=None):
 		_headers = self._getHeaders(updateParams)
 		def add_sec_hdr(resp):
-			self._setRespHeader(resp, _headers)
+			if not hasattr(resp, 'has_secure_headers'):
+				self._setRespHeader(resp, _headers)
 			return resp
 		app.after_request(add_sec_hdr)
